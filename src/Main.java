@@ -26,11 +26,12 @@ public class Main {
                 System.out.print("Enter a new anime: ");
                 String animeName = input.nextLine();
 
-                rankingSystem.addItem(animeName);
+                boolean added = rankingSystem.addItem(animeName, input);
 
+            if (added) {
                 System.out.println("\nItem added.");
                 rankingSystem.displayRankings();
-            } 
+            }
             else if (choice == 3) {
     rankingSystem.displayRankings();
 
@@ -44,8 +45,8 @@ else if (choice == 4) {
     running = false;
     System.out.println("Goodbye!");
 }
-        }
-
-        input.close();
     }
+    }
+    input.close();
+   }
 }

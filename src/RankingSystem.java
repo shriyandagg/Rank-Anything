@@ -23,8 +23,11 @@ public class RankingSystem {
         }
     }
 
-    public void addItem(String itemName) {
-    Scanner input = new Scanner(System.in);
+    public boolean addItem(String itemName, Scanner input) {
+    if (itemExists(itemName)) {
+        System.out.println(itemName + " already exists in your rankings.");
+        return false;
+    }
 
     Item newItem = new Item(itemName);
 
@@ -50,8 +53,9 @@ public class RankingSystem {
 
     rankings.add(low, newItem);
     saveRankings();
-}
 
+    return true;
+}
     public void deleteItem(int rankNumber) {
     int index = rankNumber - 1;
 
@@ -64,6 +68,16 @@ public class RankingSystem {
     saveRankings();
 
     System.out.println(removedItem.getName() + " was removed.");
+}
+
+    private boolean itemExists(String itemName) {
+    for (Item item : rankings) {
+        if (item.getName().equalsIgnoreCase(itemName)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
     public void loadRankings() {
