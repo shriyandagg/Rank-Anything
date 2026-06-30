@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class RankingSystem {
-    private ArrayList<String> rankings;
+    private ArrayList<Item> rankings;
 
     public RankingSystem() {
         rankings = new ArrayList<>();
@@ -19,32 +19,52 @@ public class RankingSystem {
         }
 
         for (int i = 0; i < rankings.size(); i++) {
-            System.out.println((i + 1) + ". " + rankings.get(i));
+            System.out.println((i + 1) + ". " + rankings.get(i).getName());
         }
     }
 
     public void addItem(String itemName) {
-        Scanner input = new Scanner(System.in);
+    Scanner input = new Scanner(System.in);
 
-        int position = rankings.size();
+    Item newItem = new Item(itemName);
 
-        for (int i = 0; i < rankings.size(); i++) {
-            System.out.println("\nWhich do you prefer?");
-            System.out.println("1. " + itemName);
-            System.out.println("2. " + rankings.get(i));
-            System.out.print("Enter 1 or 2: ");
+    int low = 0;
+    int high = rankings.size();
 
-            int choice = input.nextInt();
+    while (low < high) {
+        int mid = (low + high) / 2;
 
-            if (choice == 1) {
-                position = i;
-                break;
-            }
+        System.out.println("\nWhich do you prefer?");
+        System.out.println("1. " + newItem.getName());
+        System.out.println("2. " + rankings.get(mid).getName());
+        System.out.print("Enter 1 or 2: ");
+
+        int choice = input.nextInt();
+
+        if (choice == 1) {
+            high = mid;
+        } else {
+            low = mid + 1;
         }
-
-        rankings.add(position, itemName);
-        saveRankings();
     }
+
+    rankings.add(low, newItem);
+    saveRankings();
+}
+
+    public void deleteItem(int rankNumber) {
+    int index = rankNumber - 1;
+
+    if (index < 0 || index >= rankings.size()) {
+        System.out.println("Invalid ranking number.");
+        return;
+    }
+
+    Item removedItem = rankings.remove(index);
+    saveRankings();
+
+    System.out.println(removedItem.getName() + " was removed.");
+}
 
     public void loadRankings() {
         try {
@@ -55,9 +75,9 @@ public class RankingSystem {
                 String line = fileScanner.nextLine();
 
                 if (!line.trim().isEmpty()) {
-                rankings.add(line);
+                    rankings.add(new Item(line));
+                }
             }
-        }
 
             fileScanner.close();
 
@@ -70,8 +90,8 @@ public class RankingSystem {
         try {
             PrintWriter writer = new PrintWriter("data/rankings.txt");
 
-            for (String anime : rankings) {
-                writer.println(anime);
+            for (Item item : rankings) {
+                writer.println(item.getName());
             }
 
             writer.close();
