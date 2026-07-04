@@ -114,4 +114,15 @@ public class RankingSystem {
             System.out.println("Error saving rankings.");
         }
     }
+
+    public void searchItem(String itemName) {
+    for (int i = 0; i < rankings.size(); i++) {
+        if (rankings.get(i).getName().equalsIgnoreCase(itemName)) {
+            System.out.println(itemName + " is ranked #" + (i + 1));
+            return;
+        }
+    }
+
+    System.out.println(itemName + " was not found.");
+}
 }
