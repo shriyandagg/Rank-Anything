@@ -25,11 +25,22 @@ public class RankingSystem {
         }
 
         for (int i = 0; i < rankings.size(); i++) {
-            System.out.println((i + 1) + ". " + rankings.get(i).getName());
+            Item item = rankings.get(i);
+
+            System.out.printf(
+                "%d. %s — %.1f/10%n",
+                i + 1,
+                item.getName(),
+                item.getManualRating()
+            );
         }
     }
 
-    public boolean addItem(String itemName, Scanner input) {
+    public boolean addItem(
+        String itemName,
+        double manualRating,
+        Scanner input
+    ) {
         String cleanedName = itemName.trim();
 
         if (cleanedName.isEmpty()) {
@@ -40,14 +51,17 @@ public class RankingSystem {
         int existingRank = findItemRank(cleanedName);
 
         if (existingRank != -1) {
+            Item existingItem = rankings.get(existingRank - 1);
+
             System.out.println(
-                "\"" + rankings.get(existingRank - 1).getName()
+                "\"" + existingItem.getName()
                 + "\" already exists at rank #" + existingRank + "."
             );
+
             return false;
         }
 
-        Item newItem = new Item(cleanedName);
+        Item newItem = new Item(cleanedName, manualRating);
 
         int low = 0;
         int high = rankings.size();
@@ -74,7 +88,9 @@ public class RankingSystem {
 
         System.out.println(
             "\n" + newItem.getName()
-            + " was added at rank #" + (low + 1) + "."
+            + " was added at rank #" + (low + 1)
+            + " with a manual rating of "
+            + String.format("%.1f", manualRating) + "/10."
         );
 
         return true;
@@ -122,15 +138,54 @@ public class RankingSystem {
         System.out.println("==================================");
         System.out.println("Item: " + foundItem.getName());
         System.out.println("Current rank: #" + rank);
+
+        System.out.printf(
+            "Manual rating: %.1f/10%n",
+            foundItem.getManualRating()
+        );
     }
 
     public int getItemCount() {
         return rankings.size();
     }
 
+    public double getAverageManualRating() {
+        if (rankings.isEmpty()) {
+            return 0.0;
+        }
+
+        double total = 0.0;
+
+        for (Item item : rankings) {
+            total += item.getManualRating();
+        }
+
+        return total / rankings.size();
+    }
+
+    public Item getTopRankedItem() {
+        if (rankings.isEmpty()) {
+            return null;
+        }
+
+        return rankings.get(0);
+    }
+
+    public Item getBottomRankedItem() {
+        if (rankings.isEmpty()) {
+            return null;
+        }
+
+        return rankings.get(rankings.size() - 1);
+    }
+
     private int findItemRank(String itemName) {
         for (int i = 0; i < rankings.size(); i++) {
-            if (rankings.get(i).getName().equalsIgnoreCase(itemName)) {
+            if (
+                rankings.get(i)
+                    .getName()
+                    .equalsIgnoreCase(itemName)
+            ) {
                 return i + 1;
             }
         }
@@ -152,7 +207,9 @@ public class RankingSystem {
 
                 System.out.println("Please enter either 1 or 2.");
             } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter 1 or 2.");
+                System.out.println(
+                    "Invalid input. Please enter 1 or 2."
+                );
             }
         }
     }
@@ -171,8 +228,41 @@ public class RankingSystem {
             while (fileScanner.hasNextLine()) {
                 String line = fileScanner.nextLine().trim();
 
-                if (!line.isEmpty()) {
-                    rankings.add(new Item(line));
+                if (line.isEmpty()) {
+                    continue;
+                }
+
+                try {
+                    String[] parts = line.split("\\|");
+
+                    if (parts.length != 2) {
+                        System.out.println(
+                            "Skipped an invalid ranking entry: " + line
+                        );
+                        continue;
+                    }
+
+                    String name = parts[0].trim();
+                    double rating = Double.parseDouble(
+                        parts[1].trim()
+                    );
+
+                    if (
+                        name.isEmpty()
+                        || rating < 1.0
+                        || rating > 10.0
+                    ) {
+                        System.out.println(
+                            "Skipped an invalid ranking entry: " + line
+                        );
+                        continue;
+                    }
+
+                    rankings.add(new Item(name, rating));
+                } catch (NumberFormatException e) {
+                    System.out.println(
+                        "Skipped an invalid ranking entry: " + line
+                    );
                 }
             }
 
@@ -194,7 +284,11 @@ public class RankingSystem {
             PrintWriter writer = new PrintWriter(file);
 
             for (Item item : rankings) {
-                writer.println(item.getName());
+                writer.println(
+                    item.getName()
+                    + "|"
+                    + item.getManualRating()
+                );
             }
 
             writer.close();
@@ -221,5 +315,73 @@ public class RankingSystem {
         } catch (FileNotFoundException e) {
             System.out.println("Could not create the rankings file.");
         }
+    }
+
+    public boolean editItemName(int rankNumber, String newName) {
+    int index = rankNumber - 1;
+    String cleanedName = newName.trim();
+
+    if (index < 0 || index >= rankings.size()) {
+        System.out.println("That ranking number does not exist.");
+        return false;
+    }
+
+    if (cleanedName.isEmpty()) {
+        System.out.println("Item name cannot be empty.");
+        return false;
+    }
+
+    int existingRank = findItemRank(cleanedName);
+
+    if (existingRank != -1 && existingRank != rankNumber) {
+        System.out.println(
+            "\"" + cleanedName + "\" already exists at rank #"
+            + existingRank + "."
+        );
+        return false;
+    }
+
+    Item item = rankings.get(index);
+    String oldName = item.getName();
+
+    item.setName(cleanedName);
+    saveRankings();
+
+    System.out.println(
+        "\"" + oldName + "\" was renamed to \""
+        + cleanedName + "\"."
+    );
+
+    return true;
+}
+    public boolean editManualRating(int rankNumber, double newRating) {
+    int index = rankNumber - 1;
+
+    if (index < 0 || index >= rankings.size()) {
+        System.out.println("That ranking number does not exist.");
+        return false;
+    }
+
+    if (newRating < 1.0 || newRating > 10.0) {
+        System.out.println(
+            "The rating must be between 1.0 and 10.0."
+        );
+        return false;
+    }
+
+    Item item = rankings.get(index);
+    double oldRating = item.getManualRating();
+
+    item.setManualRating(newRating);
+    saveRankings();
+
+    System.out.printf(
+        "%s's manual rating changed from %.1f to %.1f.%n",
+        item.getName(),
+        oldRating,
+        newRating
+    );
+
+    return true;
     }
 }

@@ -1,6 +1,13 @@
-Shangri La Fontier
-Attack on Titan
-Vinland Saga
-Monster
-Demon Slayer
-Chainsaw Man
+Vinland Saga|9.9
+Attack on Titan|9.8
+Steins;Gate|9.3
+Fullmetal Alchemist: Brotherhood|9.4
+Naruto|9.1
+Hunter x Hunter|9.0
+Monster|8.8
+Jujutsu Kaisen|8.6
+Demon Slayer|8.4
+Chainsaw Man|8.3
+Solo Leveling|8.2
+Blue Lock|8.1
+One Punch Man|7.8
