@@ -37,64 +37,67 @@ public class RankingSystem {
     }
 
     public boolean addItem(
-        String itemName,
-        double manualRating,
-        Scanner input
-    ) {
-        String cleanedName = itemName.trim();
+    String itemName,
+    double manualRating,
+    Scanner input
+) {
+    String cleanedName = itemName.trim();
 
-        if (cleanedName.isEmpty()) {
-            System.out.println("Item name cannot be empty.");
-            return false;
-        }
+    if (cleanedName.isEmpty()) {
+        System.out.println("Item name cannot be empty.");
+        return false;
+    }
 
-        int existingRank = findItemRank(cleanedName);
+    int existingRank = findItemRank(cleanedName);
 
-        if (existingRank != -1) {
-            Item existingItem = rankings.get(existingRank - 1);
-
-            System.out.println(
-                "\"" + existingItem.getName()
-                + "\" already exists at rank #" + existingRank + "."
-            );
-
-            return false;
-        }
-
-        Item newItem = new Item(cleanedName, manualRating);
-
-        int low = 0;
-        int high = rankings.size();
-
-        while (low < high) {
-            int middle = low + (high - low) / 2;
-            Item existingItem = rankings.get(middle);
-
-            System.out.println("\nWhich do you prefer?");
-            System.out.println("1. " + newItem.getName());
-            System.out.println("2. " + existingItem.getName());
-
-            int choice = readComparisonChoice(input);
-
-            if (choice == 1) {
-                high = middle;
-            } else {
-                low = middle + 1;
-            }
-        }
-
-        rankings.add(low, newItem);
-        saveRankings();
+    if (existingRank != -1) {
+        Item existingItem = rankings.get(existingRank - 1);
 
         System.out.println(
-            "\n" + newItem.getName()
-            + " was added at rank #" + (low + 1)
-            + " with a manual rating of "
-            + String.format("%.1f", manualRating) + "/10."
+            "\"" + existingItem.getName()
+            + "\" already exists at rank #" + existingRank + "."
         );
 
-        return true;
+        return false;
     }
+
+    Item newItem = new Item(cleanedName, manualRating);
+
+    insertItem(newItem, input);
+    saveRankings();
+
+    System.out.println(
+        "\n" + newItem.getName()
+        + " was added successfully."
+    );
+
+    return true;
+}
+
+private void insertItem(Item item, Scanner input) {
+    int low = 0;
+    int high = rankings.size();
+
+    while (low < high) {
+        int middle = low + (high - low) / 2;
+        Item existingItem = rankings.get(middle);
+
+        System.out.println("\nWhich do you prefer?");
+        System.out.println("1. " + item.getName());
+        System.out.println("2. " + existingItem.getName());
+
+        int choice = readComparisonChoice(input);
+
+        if (choice == 1) {
+            high = middle;
+        } else {
+            low = middle + 1;
+        }
+    }
+
+    rankings.add(low, item);
+}
+
 
     public boolean deleteItem(int rankNumber) {
         int index = rankNumber - 1;
@@ -144,6 +147,30 @@ public class RankingSystem {
             foundItem.getManualRating()
         );
     }
+
+    public boolean rerankItem(int rankNumber, Scanner input) {
+    int index = rankNumber - 1;
+
+    if (index < 0 || index >= rankings.size()) {
+        System.out.println("That ranking number does not exist.");
+        return false;
+    }
+
+    Item item = rankings.remove(index);
+
+    insertItem(item, input);
+    saveRankings();
+
+    int newRank = findItemRank(item.getName());
+
+    System.out.println(
+        item.getName()
+        + " was re-ranked to position #"
+        + newRank + "."
+    );
+
+    return true;
+}
 
     public int getItemCount() {
         return rankings.size();

@@ -191,38 +191,44 @@ public class Main {
     System.out.println("\nWhat would you like to edit?");
     System.out.println("1. Rename item");
     System.out.println("2. Change manual rating");
-    System.out.println("3. Cancel");
+    System.out.println("3. Re-rank item");
+    System.out.println("4. Cancel");
 
     int editChoice = readInt(input, "Choose an option: ");
 
     switch (editChoice) {
-        case 1:
-            System.out.print("Enter the new name: ");
-            String newName = input.nextLine();
+    case 1:
+        System.out.print("Enter the new name: ");
+        String newName = input.nextLine();
 
-            rankingSystem.editItemName(rankNumber, newName);
-            break;
+        rankingSystem.editItemName(rankNumber, newName);
+        break;
 
-        case 2:
-            double newRating = readDoubleInRange(
-                input,
-                "Enter the new rating from 1.0 to 10.0: ",
-                1.0,
-                10.0
-            );
+    case 2:
+        double newRating = readDoubleInRange(
+            input,
+            "Enter the new rating from 1.0 to 10.0: ",
+            1.0,
+            10.0
+        );
 
-            rankingSystem.editManualRating(
-                rankNumber,
-                newRating
-            );
-            break;
+        rankingSystem.editManualRating(
+            rankNumber,
+            newRating
+        );
+        break;
 
-        case 3:
-            System.out.println("Edit cancelled.");
-            break;
+    case 3:
+        rankingSystem.rerankItem(rankNumber, input);
+        break;
 
-        default:
-            System.out.println("Invalid edit option.");
+    case 4:
+        System.out.println("Edit cancelled.");
+        break;
+
+    default:
+        System.out.println("Invalid edit option.");
+        break;
     }
 }
     private static double readDoubleInRange(
