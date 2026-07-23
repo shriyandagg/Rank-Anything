@@ -1,25 +1,25 @@
 public class Item {
     private String name;
-    private double manualRating;
+    private double rating;
 
-    public Item(String name, double manualRating) {
+    public Item(String name, double rating) {
         this.name = name.trim();
-        this.manualRating = manualRating;
+        this.rating = rating;
     }
 
     public String getName() {
         return name;
     }
 
-    public double getManualRating() {
-        return manualRating;
+    public double getRating() {
+        return rating;
     }
 
     public void setName(String name) {
         this.name = name.trim();
     }
 
-    public void setManualRating(double manualRating) {
-        this.manualRating = manualRating;
+    public void setRating(double rating) {
+        this.rating = rating;
     }
 }

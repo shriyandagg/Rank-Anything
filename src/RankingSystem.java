@@ -31,14 +31,13 @@ public class RankingSystem {
                 "%d. %s — %.1f/10%n",
                 i + 1,
                 item.getName(),
-                item.getManualRating()
+                item.getRating()
             );
         }
     }
 
     public boolean addItem(
     String itemName,
-    double manualRating,
     Scanner input
 ) {
     String cleanedName = itemName.trim();
@@ -61,7 +60,7 @@ public class RankingSystem {
         return false;
     }
 
-    Item newItem = new Item(cleanedName, manualRating);
+    Item newItem = new Item(cleanedName, 0.0);
 
     insertItem(newItem, input);
     saveRankings();
@@ -143,8 +142,8 @@ private void insertItem(Item item, Scanner input) {
         System.out.println("Current rank: #" + rank);
 
         System.out.printf(
-            "Manual rating: %.1f/10%n",
-            foundItem.getManualRating()
+            "Rating: %.1f/10%n",
+            foundItem.getRating()
         );
     }
 
@@ -176,7 +175,7 @@ private void insertItem(Item item, Scanner input) {
         return rankings.size();
     }
 
-    public double getAverageManualRating() {
+    public double getAverageRating() {
         if (rankings.isEmpty()) {
             return 0.0;
         }
@@ -184,7 +183,7 @@ private void insertItem(Item item, Scanner input) {
         double total = 0.0;
 
         for (Item item : rankings) {
-            total += item.getManualRating();
+            total += item.getRating();
         }
 
         return total / rankings.size();
@@ -314,7 +313,7 @@ private void insertItem(Item item, Scanner input) {
                 writer.println(
                     item.getName()
                     + "|"
-                    + item.getManualRating()
+                    + item.getRating()
                 );
             }
 
@@ -343,7 +342,7 @@ private void insertItem(Item item, Scanner input) {
             System.out.println("Could not create the rankings file.");
         }
     }
-
+    
     public boolean editItemName(int rankNumber, String newName) {
     int index = rankNumber - 1;
     String cleanedName = newName.trim();
@@ -381,7 +380,7 @@ private void insertItem(Item item, Scanner input) {
 
     return true;
 }
-    public boolean editManualRating(int rankNumber, double newRating) {
+    public boolean editRating(int rankNumber, double newRating) {
     int index = rankNumber - 1;
 
     if (index < 0 || index >= rankings.size()) {
@@ -397,9 +396,9 @@ private void insertItem(Item item, Scanner input) {
     }
 
     Item item = rankings.get(index);
-    double oldRating = item.getManualRating();
+    double oldRating = item.getRating();
 
-    item.setManualRating(newRating);
+    item.setRating(newRating);
     saveRankings();
 
     System.out.printf(
