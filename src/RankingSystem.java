@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class RankingSystem {
+    private static final int TRAINING_ITEMS = 10;
     private static final String FILE_PATH = "data/rankings.txt";
 
     private final ArrayList<Item> rankings;
@@ -50,27 +51,99 @@ public class RankingSystem {
     int existingRank = findItemRank(cleanedName);
 
     if (existingRank != -1) {
-        Item existingItem = rankings.get(existingRank - 1);
-
         System.out.println(
-            "\"" + existingItem.getName()
-            + "\" already exists at rank #" + existingRank + "."
+            "\"" + cleanedName + "\" already exists at rank #"
+            + existingRank + "."
         );
-
         return false;
     }
 
+    // Temporary rating while comparisons determine its position
     Item newItem = new Item(cleanedName, 0.0);
 
     insertItem(newItem, input);
-    saveRankings();
+
+    int newRank = findItemRank(newItem.getName());
 
     System.out.println(
         "\n" + newItem.getName()
-        + " was added successfully."
+        + " was placed at rank #" + newRank + "."
+    );
+
+    displayNearbyItems(newRank);
+
+   if (rankings.size() <= TRAINING_ITEMS) {
+    double rating = readRating(input);
+    newItem.setRating(rating);
+} else {
+    double rating = calculateRating(newItem);
+    newItem.setRating(rating);
+
+    System.out.printf(
+        "\nBased on its ranking position, "
+        + "%s received a rating of %.1f/10.%n",
+        newItem.getName(),
+        rating
+    );
+}
+
+saveRankings();
+
+    System.out.printf(
+        "%s was saved with a rating of %.1f/10.%n",
+        newItem.getName(),
+        newItem.getRating()
     );
 
     return true;
+}
+
+    private double calculateRating(Item item) {
+    int index = rankings.indexOf(item);
+
+    if (index == -1) {
+        throw new IllegalArgumentException(
+            "The item must be ranked before calculating its rating."
+        );
+    }
+
+    if (rankings.size() == 1) {
+        return 5.0;
+    }
+
+    double rating;
+
+    // New highest-ranked item
+    if (index == 0) {
+        double oldTopRating =
+            rankings.get(1).getRating();
+
+        rating = Math.min(
+            10.0,
+            oldTopRating + 0.1
+        );
+    }
+
+    // New lowest-ranked item
+    else if (index == rankings.size() - 1) {
+        double oldBottomRating =
+            rankings.get(index - 1).getRating();
+
+        rating = Math.max(
+            1.0,
+            oldBottomRating - 0.1
+        );
+    }
+
+    // New item is between two items:
+    // inherit the rating directly below it
+    else {
+        rating = rankings
+            .get(index + 1)
+            .getRating();
+    }
+
+    return Math.round(rating * 10.0) / 10.0;
 }
 
 private void insertItem(Item item, Scanner input) {
@@ -204,6 +277,67 @@ private void insertItem(Item item, Scanner input) {
 
         return rankings.get(rankings.size() - 1);
     }
+
+    private double readRating(Scanner input) {
+    while (true) {
+        System.out.print(
+            "\nEnter your rating from 1.0 to 10.0: "
+        );
+
+        String line = input.nextLine().trim();
+
+        try {
+            double rating = Double.parseDouble(line);
+
+            if (rating >= 1.0 && rating <= 10.0) {
+                return rating;
+            }
+
+            System.out.println(
+                "Please enter a rating from 1.0 to 10.0."
+            );
+
+        } catch (NumberFormatException e) {
+            System.out.println(
+                "Invalid input. Please enter a valid number."
+            );
+        }
+    }
+}
+
+    private void displayNearbyItems(int rankNumber) {
+    int index = rankNumber - 1;
+
+    System.out.println("\nNearby rankings:");
+
+    if (index > 0) {
+        Item above = rankings.get(index - 1);
+
+        System.out.printf(
+            "#%d %s — %.1f/10%n",
+            index,
+            above.getName(),
+            above.getRating()
+        );
+    }
+
+    System.out.println(
+        "#" + rankNumber + " "
+        + rankings.get(index).getName()
+        + " — Not rated yet"
+    );
+
+    if (index < rankings.size() - 1) {
+        Item below = rankings.get(index + 1);
+
+        System.out.printf(
+            "#%d %s — %.1f/10%n",
+            rankNumber + 1,
+            below.getName(),
+            below.getRating()
+        );
+    }
+}
 
     private int findItemRank(String itemName) {
         for (int i = 0; i < rankings.size(); i++) {
