@@ -9,6 +9,7 @@ Monster|8.8
 Gurren Lagann|8.7
 Jujutsu Kaisen|8.6
 Demon Slayer|8.4
+Mob Psycho 100|8.3
 Solo Leveling|8.3
 Chainsaw Man|8.3
 Blue Lock|8.1

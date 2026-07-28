@@ -58,6 +58,39 @@ public class RankingSystem {
         return false;
     }
 
+    Item closestMatch = findClosestMatch(cleanedName);
+
+if (closestMatch != null) {
+    System.out.println(
+        "\nDid you mean \"" + closestMatch.getName() + "\"?"
+    );
+
+    System.out.println(
+        "It already exists at rank #"
+        + findItemRank(closestMatch.getName()) + "."
+    );
+
+    System.out.println("1. Yes, view the existing item");
+    System.out.println("2. No, add my entry anyway");
+    System.out.println("3. Cancel");
+
+    int choice = readChoiceInRange(
+        input,
+        "Choose an option: ",
+        1,
+        3
+    );
+
+    if (choice == 1) {
+        searchItem(closestMatch.getName(), input);
+        return false;
+    }
+
+    if (choice == 3) {
+        System.out.println("Add cancelled.");
+        return false;
+    }
+}
     // Temporary rating while comparisons determine its position
     Item newItem = new Item(cleanedName, 0.0);
 
@@ -189,36 +222,68 @@ private void insertItem(Item item, Scanner input) {
         return true;
     }
 
-    public void searchItem(String itemName) {
-        String cleanedName = itemName.trim();
+    public void searchItem(String itemName, Scanner input) {
+    String cleanedName = itemName.trim();
 
-        if (cleanedName.isEmpty()) {
-            System.out.println("Search name cannot be empty.");
-            return;
-        }
-
-        int rank = findItemRank(cleanedName);
-
-        if (rank == -1) {
-            System.out.println(
-                "\"" + cleanedName + "\" was not found in your rankings."
-            );
-            return;
-        }
-
-        Item foundItem = rankings.get(rank - 1);
-
-        System.out.println("\n==================================");
-        System.out.println("             Search Result");
-        System.out.println("==================================");
-        System.out.println("Item: " + foundItem.getName());
-        System.out.println("Current rank: #" + rank);
-
-        System.out.printf(
-            "Rating: %.1f/10%n",
-            foundItem.getRating()
-        );
+    if (cleanedName.isEmpty()) {
+        System.out.println("Search name cannot be empty.");
+        return;
     }
+
+    int rank = findItemRank(cleanedName);
+
+    // Exact match
+    if (rank != -1) {
+        displaySearchResult(rank);
+        return;
+    }
+
+    // No exact match, so check for a likely misspelling
+    Item closestMatch = findClosestMatch(cleanedName);
+
+    if (closestMatch != null) {
+        System.out.println(
+            "\nDid you mean \"" + closestMatch.getName() + "\"?"
+        );
+        System.out.println("1. Yes");
+        System.out.println("2. No");
+
+        int choice = readChoiceInRange(
+            input,
+            "Choose an option: ",
+            1,
+            2
+        );
+
+        if (choice == 1) {
+            int closestRank = findItemRank(
+                closestMatch.getName()
+            );
+
+            displaySearchResult(closestRank);
+            return;
+        }
+    }
+
+    System.out.println(
+        "\"" + cleanedName + "\" was not found in your rankings."
+    );
+}
+
+    private void displaySearchResult(int rank) {
+    Item foundItem = rankings.get(rank - 1);
+
+    System.out.println("\n==================================");
+    System.out.println("             Search Result");
+    System.out.println("==================================");
+    System.out.println("Item: " + foundItem.getName());
+    System.out.println("Current rank: #" + rank);
+
+    System.out.printf(
+        "Rating: %.1f/10%n",
+        foundItem.getRating()
+    );
+}
 
     public boolean rerankItem(int rankNumber, Scanner input) {
     int index = rankNumber - 1;
@@ -514,6 +579,73 @@ private void insertItem(Item item, Scanner input) {
 
     return true;
 }
+
+    private int levenshteinDistance(String first, String second) {
+    String a = first.toLowerCase();
+    String b = second.toLowerCase();
+
+    int[][] distance = new int[a.length() + 1][b.length() + 1];
+
+    for (int i = 0; i <= a.length(); i++) {
+        distance[i][0] = i;
+    }
+
+    for (int j = 0; j <= b.length(); j++) {
+        distance[0][j] = j;
+    }
+
+    for (int i = 1; i <= a.length(); i++) {
+        for (int j = 1; j <= b.length(); j++) {
+            int substitutionCost =
+                a.charAt(i - 1) == b.charAt(j - 1) ? 0 : 1;
+
+            int deletion = distance[i - 1][j] + 1;
+            int insertion = distance[i][j - 1] + 1;
+            int substitution =
+                distance[i - 1][j - 1] + substitutionCost;
+
+            distance[i][j] = Math.min(
+                Math.min(deletion, insertion),
+                substitution
+            );
+        }
+    }
+
+    return distance[a.length()][b.length()];
+}
+
+    private Item findClosestMatch(String itemName) {
+    if (rankings.isEmpty()) {
+        return null;
+    }
+
+    Item closestItem = null;
+    int smallestDistance = Integer.MAX_VALUE;
+
+    for (Item item : rankings) {
+        int distance = levenshteinDistance(
+            itemName.trim(),
+            item.getName()
+        );
+
+        if (distance < smallestDistance) {
+            smallestDistance = distance;
+            closestItem = item;
+        }
+    }
+
+    int allowedDistance = Math.max(
+        2,
+        itemName.trim().length() / 4
+    );
+
+    if (smallestDistance <= allowedDistance) {
+        return closestItem;
+    }
+
+    return null;
+}
+
     public boolean editRating(int rankNumber, double newRating) {
     int index = rankNumber - 1;
 
@@ -544,4 +676,33 @@ private void insertItem(Item item, Scanner input) {
 
     return true;
     }
+
+    private int readChoiceInRange(
+    Scanner input,
+    String prompt,
+    int minimum,
+    int maximum
+) {
+    while (true) {
+        System.out.print(prompt);
+        String line = input.nextLine().trim();
+
+        try {
+            int choice = Integer.parseInt(line);
+
+            if (choice >= minimum && choice <= maximum) {
+                return choice;
+            }
+
+            System.out.println(
+                "Please enter a number from "
+                + minimum + " to " + maximum + "."
+            );
+        } catch (NumberFormatException e) {
+            System.out.println(
+                "Invalid input. Please enter a whole number."
+            );
+        }
+    }
+}
 }

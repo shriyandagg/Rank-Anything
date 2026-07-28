@@ -113,7 +113,7 @@ public class Main {
         System.out.print("Enter the item name to search: ");
         String itemName = input.nextLine();
 
-        rankingSystem.searchItem(itemName);
+        rankingSystem.searchItem(itemName, input);
     }
 
     private static void handleEditItem(
