@@ -1,46 +1,83 @@
 # RankAnything
 
-A Java application that allows users to rank anything using pairwise comparisons instead of assigning ratings directly.
-
-Instead of deciding a numerical score, users compare two items at a time. The application automatically determines where each new item belongs in the rankings and saves everything between sessions.
-
----
+A Java application that creates personalized rankings through pairwise comparisons using a binary-search insertion algorithm.
 
 ## Features
 
-- View current rankings
-- Add new items through comparison-based ranking
-- Binary-search insertion to minimize comparisons
-- Search for items
-- Delete items
-- Prevent duplicate entries
-- Automatically save and load rankings
+- Pairwise comparison ranking
+- Binary-search insertion
+- Automatic rating assignment
+- Search with typo correction
+- Edit, delete, and rerank items
+- Persistent file storage
+- Ranking statistics
 
----
+## Algorithms
 
-## How It Works
+RankAnything uses binary-search insertion to minimize the number of comparisons required when inserting a new item.
 
-When a new item is added, the program compares it against existing items.
+After an initial training phase, the application estimates ratings for newly added items based on their position relative to neighboring rankings.
 
-Example:
+## Main Menu
+
+The application provides a simple console interface for viewing rankings, adding new items, searching, editing entries, and viewing statistics.
+
+```text
+==================================
+            RankAnything
+==================================
+1. View Rankings
+2. Add Item
+3. Delete Item
+4. Search Item
+5. Edit Item
+6. View Statistics
+7. Exit
+==================================
+```
+
+## Ranking a New Item
+
+When a new item is added, RankAnything compares it against existing entries using pairwise comparisons and a binary-search insertion algorithm. After the correct position is found, the application estimates an initial rating based on nearby items.
+
+```text
+Which do you prefer?
+
+1. Frieren: Beyond Journey's End
+2. Gurren Lagann
+
+Enter 1 or 2: 1
 
 Which do you prefer?
 
-1. Jujutsu Kaisen
-2. Vinland Saga
+1. Frieren: Beyond Journey's End
+2. Naruto
 
-↓
+Enter 1 or 2: 2
 
-Which do you prefer?
+...
 
-1. Jujutsu Kaisen
-2. Demon Slayer
+Frieren: Beyond Journey's End was placed at rank #7.
 
-↓
+Nearby rankings:
+#6 Hunter x Hunter — 9.0/10
+#7 Frieren: Beyond Journey's End — Not rated yet
+#8 Tomodachi Game — 8.8/10
 
-The application determines the correct ranking position based on your answers.
+Based on its ranking position, Frieren: Beyond Journey's End received a rating of 8.8/10.
+```
 
----
+## Searching the Rankings
+
+Users can quickly search for any ranked item to view its current ranking and rating. If a search term is misspelled, the application suggests the closest matching item.
+
+```text
+Search Result
+
+Item: Frieren: Beyond Journey's End
+Current Rank: #7
+Rating: 8.8/10
+```
 
 ## Technologies
 
@@ -48,28 +85,12 @@ The application determines the correct ranking position based on your answers.
 - Object-Oriented Programming
 - ArrayLists
 - File I/O
-- Git
-- GitHub
+- Binary Search
+- Levenshtein Distance
 
----
+## Future Improvements
 
-## Future Features
-
-- Manual ratings
-- Suggested ratings based on comparison history
-- Confidence score for each ranking
-- "Did you mean...?" typo detection
-- Statistics dashboard
-- Export rankings
-- Categories (Anime, Movies, Restaurants, Games, etc.)
-- Suggestion mode that recommends common items the user may have forgotten to add.
-
----
-
-## Why I Built This
-
-I wanted a better way to rank subjective things.
-
-Giving every item a score from 1–10 often leads to inconsistent ratings. Instead, this project uses pairwise comparisons to build rankings naturally while minimizing the number of comparisons required.
-
-The goal is to create a generic ranking engine that can be used for anime, movies, books, restaurants, games, or anything else.
+- Multiple ranking lists
+- GUI version
+- Export to CSV
+- Cloud synchronization
