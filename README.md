@@ -2,6 +2,14 @@
 
 A Java application that creates personalized rankings through pairwise comparisons using a binary-search insertion algorithm.
 
+---
+
+## Overview
+
+RankAnything allows users to build personalized rankings by comparing two items at a time instead of assigning arbitrary scores. The application uses binary-search insertion to efficiently determine where new items belong while minimizing the number of comparisons required. The project was built to strengthen object-oriented programming, algorithm design, file persistence, and search functionality while creating a practical ranking system.
+
+---
+
 ## Features
 
 - Pairwise comparison ranking
@@ -12,11 +20,17 @@ A Java application that creates personalized rankings through pairwise compariso
 - Persistent file storage
 - Ranking statistics
 
+---
+
 ## Algorithms
 
-RankAnything uses binary-search insertion to minimize the number of comparisons required when inserting a new item.
+RankAnything uses **binary-search insertion** to minimize the number of comparisons required when inserting a new item.
 
 After an initial training phase, the application estimates ratings for newly added items based on their position relative to neighboring rankings.
+
+The application also uses **Levenshtein Distance** to provide typo-tolerant search suggestions.
+
+---
 
 ## Main Menu
 
@@ -35,6 +49,8 @@ The application provides a simple console interface for viewing rankings, adding
 7. Exit
 ==================================
 ```
+
+---
 
 ## Ranking a New Item
 
@@ -67,9 +83,11 @@ Nearby rankings:
 Based on its ranking position, Frieren: Beyond Journey's End received a rating of 8.8/10.
 ```
 
+---
+
 ## Searching the Rankings
 
-Users can quickly search for any ranked item to view its current ranking and rating. If a search term is misspelled, the application suggests the closest matching item.
+Users can quickly search for any ranked item to view its current ranking and rating. If a search term is misspelled, the application suggests the closest matching item using Levenshtein Distance.
 
 ```text
 Search Result
@@ -78,6 +96,8 @@ Item: Frieren: Beyond Journey's End
 Current Rank: #7
 Rating: 8.8/10
 ```
+
+---
 
 ## Technologies
 
@@ -88,9 +108,46 @@ Rating: 8.8/10
 - Binary Search
 - Levenshtein Distance
 
+---
+
+## Time Complexity
+
+| Operation | Complexity |
+|-----------|------------|
+| Binary-search insertion | O(log n) comparisons |
+| Search | O(log n) |
+| File save/load | O(n) |
+
+---
+
+## Running the Project
+
+Clone the repository and compile the Java source files.
+
+```bash
+javac Main.java
+java Main
+```
+
+---
+
 ## Future Improvements
 
-- Multiple ranking lists
-- GUI version
-- Export to CSV
-- Cloud synchronization
+- Support multiple ranking lists
+- GUI version (JavaFX)
+- Export rankings to CSV or PDF
+- Undo/redo functionality
+- Web-based version
+
+---
+
+## What I Learned
+
+While building RankAnything, I gained experience with:
+
+- Object-oriented design
+- Binary search algorithms
+- File persistence
+- Efficient data management
+- Search algorithms and typo correction
+- Building a complete console application from design to implementation
