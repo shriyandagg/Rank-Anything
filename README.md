@@ -110,14 +110,11 @@ Rating: 8.8/10
 
 ---
 
-## Time Complexity
+## Algorithms
 
-| Operation | Complexity |
-|-----------|------------|
-| Binary-search insertion | O(log n) comparisons |
-| Search | O(log n) |
-| File save/load | O(n) |
-
+- Binary search is used to efficiently determine the insertion position for new items, requiring O(log n) comparisons.
+- Rankings are stored in an ArrayList, so inserting an item requires shifting later elements, resulting in O(n) overall insertion time.
+- Levenshtein Distance is used to provide typo-tolerant search suggestions.
 ---
 
 ## Running the Project
